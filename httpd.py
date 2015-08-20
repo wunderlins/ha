@@ -36,6 +36,13 @@ import webctx
 
 ## global variables ############################################################
 
+# url to class mapping
+urls = (
+  '/', 'webctx.index',
+  '/ha(.*)', 'webctx.ha',
+  '/login', 'webctx.login',
+)
+
 # default session values
 session_default = {
 	"uid": -1,
@@ -134,7 +141,7 @@ app = None
 if __name__ == "__main__":
 	web.config.debug = False
 
-	app = service(webctx.urls, globals())
+	app = service(urls, globals())
 	# session setup, make sure to call it only once if in debug mode
 	init_session(app)
 	

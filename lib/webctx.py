@@ -11,15 +11,24 @@ import os
 import usbauth
 import hashlib
 import sqlite3
+import cx_Oracle
+
+tns_str = "(DESCRIPTION = "+\
+	"(FAILOVER = ON)(LOAD_BALANCE = OFF)(ENABLE=BROKEN)(ADDRESS_LIST ="+\
+		"(ADDRESS = (PROTOCOL = TCP)(HOST = oraisop.uhbs.ch)(PORT = 1545))"+\
+		"(ADDRESS = (PROTOCOL = TCP)(HOST = oraisop2.uhbs.ch)(PORT = 1545)))"+\
+	"(CONNECT_DATA =(SERVICE_NAME = ISOP_PRI.WORLD)"+\
+	"(failover_mode=(type=select) (method=basic))))"
+
 
 session = None
 
-# url to class mapping
-urls = (
-  '/', 'ha',
-  '/ha', 'ha',
-  '/holdingarea', 'ha',
-)
+def oraconn():
+	con = cx_Oracle.connect('oppsc', 'oppsc', tns_str)
+	cursor = con.cursor()
+	
+	return (con, cursor)
+
 
 def is_dict(d):
 	""" additional template function, registered with web.template.render """
@@ -199,16 +208,38 @@ class index(webctx):
 		return render.index()
 		#return out
 
-
 class ha(webctx):
-	""" List Holdingarea Patients """
-	def GET(self):
-	""" serve a GET request """
+	""" Serve index page """
+	def GET(self, param=None):
+		"""
 		if not self.auth_check():
 			return self.render().login()
+		"""
+		web.debug(param)
+		conn, cursor = oraconn()
 		
-		return self.render().ha()
+		sql = """SELECT OPTEXT, STMNAME, STMVORNAME, TO_CHAR(TO_DATE(STMGEBDAT, 'YYYYMMDD'), 'DD.MM.YYYY'), OPSAAL, OPSEQ 
+			FROM DATO_OP
+			WHERE OPDATUM = '20150820'
+				AND UPPER(SUBSTR(OPTEXT, 0, 2)) = 'HA'
+				AND TSCANCEL IS NULL AND (DEL IS NULL OR DEL = 'N')
+			ORDER BY OPSAAL, OPSEQ"""
 		
+		#web.debug(conn)
+		#web.debug(cursor)
+		
+		res = []
+		
+		try:
+			cursor.execute(sql)
+		except Exception, e:
+			web.debug(e)
+			return "database error"
+		
+		for row in cursor:
+			res.append(row)
+		
+		return self.render().ha(res)
 
 class image(webctx):
 	no_auth = True

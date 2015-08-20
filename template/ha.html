@@ -1,4 +1,4 @@
-$def with ()
+$def with (recordset)
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +7,42 @@ $def with ()
 </head>
 <body>
 
-<h1>Hello World</h1>
+
+<form action="/ha" method="GET">
+Datum: <input type="text" name="datum" value="21.08.2015" />
+<button type="submit">Yepppers</button>
+</form>
+
+<table>
+	<thead>
+		<tr>
+			<td></td>
+			<td>Geplante OP</td>
+			<td>Nachname</td>
+			<td>Vorname</td>
+			<td>Gebdat</td>
+			<td>Saal/Seq</td>
+			<td></td>
+		</tr>
+	</thead>
+
+	<tbody>
+	$for row in recordset:
+		<tr>
+			<td>
+				<input type="checkbox" />
+				<input type="checkbox" />
+				<input type="checkbox" />
+			</td>
+			<td>$row[0]</td>
+			<td>$row[1]</td>
+			<td>$row[2]</td>
+			<td>$row[3]</td>
+			<td>$row[4] / $row[5]</td>
+		</tr>
+	</tbody>
+</table>
+
 
 </body>
 </html>
