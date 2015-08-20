@@ -210,17 +210,26 @@ class index(webctx):
 
 class ha(webctx):
 	""" Serve index page """
-	def GET(self, param=None):
+	def GET(self):
 		"""
 		if not self.auth_check():
 			return self.render().login()
 		"""
-		web.debug(param)
 		conn, cursor = oraconn()
 		
-		sql = """SELECT OPTEXT, STMNAME, STMVORNAME, TO_CHAR(TO_DATE(STMGEBDAT, 'YYYYMMDD'), 'DD.MM.YYYY'), OPSAAL, OPSEQ 
+		default_dt = datetime.datetime.now() + datetime.timedelta(days=1)
+		
+		datum = web.input(datum=default_dt.strftime("%d.%m.%Y")).datum
+		web.debug(datum)
+		
+		try:
+			dt = datetime.datetime.strptime(datum, '%d.%m.%Y')
+		except:
+			return "Failed to parse input date"
+		
+		sql = """SELECT OPTEXT, STMNAME, STMVORNAME, TO_CHAR(TO_DATE(STMGEBDAT, 'YYYYMMDD'), 'DD.MM.YYYY'), OPSAAL, OPSEQ, ID 
 			FROM DATO_OP
-			WHERE OPDATUM = '20150820'
+			WHERE OPDATUM = '""" + str(dt.strftime("%Y%m%d")) +  """'
 				AND UPPER(SUBSTR(OPTEXT, 0, 2)) = 'HA'
 				AND TSCANCEL IS NULL AND (DEL IS NULL OR DEL = 'N')
 			ORDER BY OPSAAL, OPSEQ"""
@@ -236,10 +245,13 @@ class ha(webctx):
 			web.debug(e)
 			return "database error"
 		
-		for row in cursor:
-			res.append(row)
+		alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 		
-		return self.render().ha(res)
+		for row in cursor:
+			if row[0][3].lower() not in alpha:
+			 res.append(row)
+		
+		return self.render().ha(res, dt.strftime("%d.%m.%Y"))
 
 class image(webctx):
 	no_auth = True

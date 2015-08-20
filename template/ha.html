@@ -1,4 +1,4 @@
-$def with (recordset)
+$def with (recordset, datum)
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,20 +9,26 @@ $def with (recordset)
 
 
 <form action="/ha" method="GET">
-Datum: <input type="text" name="datum" value="21.08.2015" />
+Datum: <input type="text" name="datum" value="$datum" />
 <button type="submit">Yepppers</button>
 </form>
 
-<table>
+<table border="1">
 	<thead>
 		<tr>
-			<td></td>
-			<td>Geplante OP</td>
-			<td>Nachname</td>
-			<td>Vorname</td>
-			<td>Gebdat</td>
-			<td>Saal/Seq</td>
-			<td></td>
+			<td colspan="2">Venflon</td>
+			<td colspan="2">infusion</td>
+			<td rowspan="2">Geplante OP</td>
+			<td rowspan="2">Nachname</td>
+			<td rowspan="2">Vorname</td>
+			<td rowspan="2">Gebdat</td>
+			<td rowspan="2">Saal/Seq</td>
+		</tr>
+		<tr>
+			<td>R</td>
+			<td>L</td>
+			<td>RV</td>
+			<td>3-H</td>
 		</tr>
 	</thead>
 
@@ -30,9 +36,16 @@ Datum: <input type="text" name="datum" value="21.08.2015" />
 	$for row in recordset:
 		<tr>
 			<td>
-				<input type="checkbox" />
-				<input type="checkbox" />
-				<input type="checkbox" />
+				<input type="checkbox" name="vl_$row[6]" />
+			</td>
+			<td>
+				<input type="checkbox" name="vr_$row[6]" />
+			</td>
+			<td>
+				<input type="checkbox" name="inf_rv_$row[6]" />
+			</td>
+			<td>
+				<input type="checkbox" name="inf_3h_$row[6]" />
 			</td>
 			<td>$row[0]</td>
 			<td>$row[1]</td>
