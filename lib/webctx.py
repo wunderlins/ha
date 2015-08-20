@@ -14,6 +14,13 @@ import sqlite3
 
 session = None
 
+# url to class mapping
+urls = (
+  '/', 'ha',
+  '/ha', 'ha',
+  '/holdingarea', 'ha',
+)
+
 def is_dict(d):
 	""" additional template function, registered with web.template.render """
 	return type(d) is dict
@@ -191,6 +198,17 @@ class index(webctx):
 		render = web.template.render('template')
 		return render.index()
 		#return out
+
+
+class ha(webctx):
+	""" List Holdingarea Patients """
+	def GET(self):
+	""" serve a GET request """
+		if not self.auth_check():
+			return self.render().login()
+		
+		return self.render().ha()
+		
 
 class image(webctx):
 	no_auth = True
