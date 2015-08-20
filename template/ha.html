@@ -113,6 +113,11 @@ $def with (recordset, datum)
 	</script>
 	<style>
 		#datum {width: 6em;}
+		body {padding-top: 1em;}
+		
+		@media print {
+			#foot, #dateform {display: none;}
+		}
 	</style>
 </head>
 <body>
@@ -120,18 +125,19 @@ $def with (recordset, datum)
 
 <div class="container">
 
-	<div class="form-group">
+	<div class="form-group" id="dateform">
 		<form action="/ha" method="GET">
-		Datum: <input type="text" name="datum" id="datum" value="$datum" />
+		<lable for="datum">Datum:</label>		
+		<input type="text" name="datum" id="datum" value="$datum" />
 		<button type="submit">Yepppers</button>
 		</form>
 	</div>
 
-	<table class="table table-striped">
+	<table class="table table-striped table-hover">
 		<thead>
 			<tr>
 				<th colspan="2">Venflon</th>
-				<th colspan="2">infusion</th>
+				<th colspan="2">Infusion</th>
 				<th rowspan="2">Geplante OP</th>
 				<th rowspan="2">Nachname</th>
 				<th rowspan="2">Vorname</th>
@@ -153,13 +159,13 @@ $def with (recordset, datum)
 					<input type="checkbox" 
 					$if row[7]:
 						checked
-					name="vl_$row[6]" />
+					name="vr_$row[6]" />
 				</td>
 				<td>
 					<input type="checkbox" 
 					$if row[8]:
 						checked
-					name="vr_$row[6]" />
+					name="vl_$row[6]" />
 				</td>
 				<td>
 					<input type="checkbox" 
@@ -181,11 +187,14 @@ $def with (recordset, datum)
 			</tr>
 		</tbody>
 	</table>
-	<br />
-	<button onclick="store_check()" >Speichern</button>
+	
+	<div id="foot">
+		<br />
+		<button onclick="store_check()" >Speichern</button>
 
-	<hr />
-	2015, <a href="mailto:simon.wunderlin@usb.ch">Simon Wunderlin</a>
+		<hr />
+		2015, <a href="mailto:simon.wunderlin@usb.ch">Simon Wunderlin</a>
+	</div>
 </div>
 
 <script>       
