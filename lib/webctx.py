@@ -253,6 +253,78 @@ class ha(webctx):
 		
 		return self.render().ha(res, dt.strftime("%d.%m.%Y"))
 
+	def POST(self):
+		raw_data = web.data()
+		conn, cursor = oraconn()
+		
+		web.header('Content-Type', 'application/json')
+		
+		try:
+			data = json.loads(raw_data)
+		except:
+			return '{"success": false, "message": "Failed to decode json string"}'
+		
+		for row in data:
+			web.debug(row)
+			
+			# check if all False
+			if row["INFUSION_3H"] == False and row["INFUSION_RV"] == False and \
+			   row["VENFLON_L"] == False and row["VENFLON_R"] == False:
+				
+				# all False,: delete db record
+				sql = "DELETE FROM DATO_HOLDINGAREA WHERE OPID = " + str(row["id"])
+				web.debug(sql)
+				try:
+					cursor.execute(sql)
+				except Exception, e:
+					web.debug(e)
+					return '{"success": false, "message": "Failed to delete in database"}'
+			
+			else:
+				# check if record exists
+				sql = "SELECT OPID FROM DATO_HOLDINGAREA WHERE OPID = " + str(row["id"])
+				web.debug(sql)
+				try:
+					cursor.execute(sql)
+				except Exception, e:
+					web.debug(e)
+					return '{"success": false, "message": "Failed to query in database"}'
+				
+				count = 0
+				for r in cursor:
+					count += 1
+				
+				if count:
+					# update
+					web.debug(row)
+					sql = """UPDATE DATO_HOLDINGAREA SET 
+					         VENFLON_R = """ + str(int(row["VENFLON_R"])) + """,
+					         VENFLON_L = """ + str(int(row["VENFLON_L"])) + """,
+					         INFUSION_RV = """ + str(int(row["INFUSION_RV"])) + """,
+					         INFUSION_3H = """ + str(int(row["INFUSION_3H"])) + """
+					         WHERE OPID = """ + str(row["id"])
+					web.debug(sql)
+					try:
+						cursor.execute(sql)
+					except Exception, e:
+						web.debug(e)
+						return '{"success": false, "message": "Failed to update in database"}'
+				
+				else:
+					# insert
+					sql = """INSERT INTO DATO_HOLDINGAREA 
+					         (VENFLON_R, VENFLON_L, INFUSION_RV, INFUSION_3H, OPID) VALUES ( """ + \
+					         str(int(row["VENFLON_R"])) + ", " + str(int(row["VENFLON_L"])) + ", " + str(int(row["INFUSION_RV"])) + ", " + str(int(row["INFUSION_3H"])) + ", " + str(int(row["id"])) + ")"
+					web.debug(sql)
+					try:
+						cursor.execute(sql)
+					except Exception, e:
+						web.debug(e)
+						return '{"success": false, "message": "Failed to insert in database"}'
+			conn.commit()
+		
+		return '{"success": true}'
+
 class image(webctx):
 	no_auth = True
 	""" Serve image, this method requires not authentication """

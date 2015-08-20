@@ -4,14 +4,94 @@ $def with (recordset, datum)
 <head>
 	<meta charset="utf-8">
 	<title>Holding Area</title>
+	
+	<script src="static/jquery-2.1.3.min.js"></script>
+	<script type="text/javascript">
+
+	function store_check() {
+		var inputs = document.getElementsByTagName("input")
+		
+		var temp = [];
+		var filled = [];
+		var result = [];
+		
+		for (i=0; i<inputs.length; i++) {
+			var current = inputs[i];
+			if (current.type != "checkbox")
+				continue;
+			
+			var nv = current.name.split("_")
+			console.log(nv)
+			
+			var id = nv[1];
+			var name = nv[0];
+			
+			if (!temp[id]) {
+				filled[filled.length] = parseInt(id);
+				temp[id] = {
+					"VENFLON_R": false,
+					"VENFLON_L": false,
+					"INFUSION_RV": false,
+					"INFUSION_3H": false
+				}
+			}
+			
+			if (current.checked) {
+				var el = "";
+				
+				switch (name) {
+					case "vl":
+						el = "VENFLON_L"; break;
+					case "vr":
+						el = "VENFLON_R"; break;
+					case "infrv":
+						el = "INFUSION_RV"; break;
+					case "inf3h":
+						el = "INFUSION_3H"; break;
+				}
+				
+				temp[id][el] = true;
+			}
+		}
+		
+		
+		console.log(temp)
+		console.log(filled)
+		
+		for (i=0; i<filled.length; i++) {
+			var t = temp[filled[i]];
+			t.id = filled[i];
+			result[result.length] = t;
+		}
+		
+		console.log(result)
+		
+		$$.ajax({
+				method: "POST",
+				url: "ha",
+				data: JSON.stringify(result)
+			})
+			.done(function(data) {
+				console.log(data)
+				if (data.success == false) {
+					alert("Fehler in der kommunikation mit dem server, Grund: " + data.message)
+				}
+			})
+			.fail(function() {
+				alert( "Daten wurden NICHT gespeichert, Netzwerk Fehler ist aufgetreten." );
+			})
+		
+	}		
+	</script>
 </head>
 <body>
 
 
 <form action="/ha" method="GET">
-Datum: <input type="text" name="datum" value="$datum" />
+Datum: <input type="text" name="datum" id="datum" value="$datum" />
 <button type="submit">Yepppers</button>
 </form>
+
 
 <table border="1">
 	<thead>
@@ -42,10 +122,10 @@ Datum: <input type="text" name="datum" value="$datum" />
 				<input type="checkbox" name="vr_$row[6]" />
 			</td>
 			<td>
-				<input type="checkbox" name="inf_rv_$row[6]" />
+				<input type="checkbox" name="infrv_$row[6]" />
 			</td>
 			<td>
-				<input type="checkbox" name="inf_3h_$row[6]" />
+				<input type="checkbox" name="inf3h_$row[6]" />
 			</td>
 			<td>$row[0]</td>
 			<td>$row[1]</td>
@@ -55,7 +135,8 @@ Datum: <input type="text" name="datum" value="$datum" />
 		</tr>
 	</tbody>
 </table>
-
+<br />
+<button onclick="store_check()" >Speichern</button>
 
 </body>
 </html>
