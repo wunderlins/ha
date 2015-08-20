@@ -1,0 +1,144 @@
+$def with ()
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>json</title>
+	
+	<style type="text/css">
+	body {
+		font-family: Verdana, "Bitstream Vera Sans", "DejaVu Sans", Tahoma, Geneva, 
+			Arial, Sans-serif;
+	}
+	input[type=number] {text-align: right;}
+	#console {
+		margin-top: 1em;
+	}
+	div span.label {
+		padding-right: 1em; 
+		font-weight: bold;
+	}
+	
+	#console {
+		color: lime;
+		border: 1px inset #aaa;
+		font-family: courier, fixed;
+		font-size: 0.8em;
+		padding: 0.5em;
+		background-color: black;
+	}
+	
+	fieldset {float: left;}
+	
+	#break {clear: both;}
+	
+	#container {height: 6.5em;}
+	#container>fieldset {
+		height: inherit;
+		width: 280px;
+	}
+	</style>
+	
+	<script type="application/javascript">
+	function send_form(obj) {
+		// get data from the form
+		var int1 = parseInt(document.getElementById("int1").value);
+		var int2 = parseInt(document.getElementById("int2").value);
+		
+		// display the values gathered fro mthe form
+		console.log(int1 + " " + int2);
+		
+		// user input sanity check
+		if (isNaN(int1)) {
+			alert("«int1» is not a number");
+			return false;
+		}
+		
+		if (isNaN(int2)) {
+			alert("«int2» is not a number");
+			return false;
+		}
+		
+		// create a json request object
+		var params = {
+			int1: int1,
+			int2: int2
+		}
+		
+		var r = new XMLHttpRequest();
+		r.open("POST", "/json2", true);
+		r.setRequestHeader("Content-Type","application/json; charset=utf-8");
+		r.onreadystatechange = function () {
+			switch (r.readyState) {
+				case 0:
+					document.getElementById('info').innerHTML = 'request not initialized. Status: ' + r.statusText;
+					break;
+				case 1:
+					document.getElementById('info').innerHTML = 'server connection established. Status: ' + r.statusText;
+					break;
+				case 2:
+					document.getElementById('info').innerHTML = 'request received. Status: ' + r.statusText;
+					break;
+				case 3:
+					document.getElementById('info').innerHTML = 'processing request. Status: ' + r.statusText;
+					break;
+				case 4:
+					document.getElementById('info').innerHTML = 'request finished and response is ready. Status: ' + r.statusText;
+					break;
+			}
+			if (r.readyState==4 && r.status==200) {
+				//console.log(data)
+				data = JSON.parse(r.responseText);
+				if (data.error == 1) {
+					document.getElementById('info').innerHTML = 'Response contains an error.'
+				}
+				document.getElementById("result").innerHTML = 
+					data.i1 + " <em>and</em> " + data.i2 + " <em>equals</em> " + data.res;
+				return
+			};
+		};
+		r.send(JSON.stringify(params));
+	}
+	</script>
+</head>
+<body>
+
+<h1>Add two numbers</h1>
+
+<div id="container">
+	<fieldset>
+		<legend>Input</legend>
+		<form method="post" action="/json2" id="numbers_form">
+			<table>
+				<tr>
+					<td>integer 1</td>
+					<td><input type="number" name="int1" id="int1" min="0" max="1024" step="1" value="5"/></td>
+				</tr>
+				<tr>
+					<td>integer 2</td>
+					<td><input type="number" name="int2" id="int2" min="0" max="1024" step="1" value="220"/></td>
+				</tr>
+			</table>
+			<button type="button" onclick="send_form(this); return false;">Send Values to Server »</button>
+		</form>
+	</fieldset>
+	
+	<fieldset>
+		<legend>Result</legend>
+		<div id="result">
+		</div>
+	</fieldset>
+</div>
+<div id="break"></div>
+
+<div id="console">
+	<span class="label">Network Status: </span>
+	<span id="info">N/A</span>
+</div>
+
+<hr size="1"/>
+<a href="http://vanilla-js.com/"><img src="http://vanilla-js.com/assets/button.png" alt="100% Vanilla JS Compatible"
+     style="vertical-align: middle"/></a>
+<small>Now 100% Vanilla JS Compatible; Ju5t b3caUse wE cAn xD</small>
+</body>
+</html>
