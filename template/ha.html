@@ -116,16 +116,28 @@ Datum: <input type="text" name="datum" id="datum" value="$datum" />
 	$for row in recordset:
 		<tr>
 			<td>
-				<input type="checkbox" name="vl_$row[6]" />
+				<input type="checkbox" 
+				$if row[7]:
+					checked
+				name="vl_$row[6]" />
 			</td>
 			<td>
-				<input type="checkbox" name="vr_$row[6]" />
+				<input type="checkbox" 
+				$if row[8]:
+					checked
+				name="vr_$row[6]" />
 			</td>
 			<td>
-				<input type="checkbox" name="infrv_$row[6]" />
+				<input type="checkbox" 
+				$if row[9]:
+					checked
+				name="infrv_$row[6]" />
 			</td>
 			<td>
-				<input type="checkbox" name="inf3h_$row[6]" />
+				<input type="checkbox" 
+				$if row[10]:
+					checked
+				name="inf3h_$row[6]" />
 			</td>
 			<td>$row[0]</td>
 			<td>$row[1]</td>

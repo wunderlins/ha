@@ -227,12 +227,15 @@ class ha(webctx):
 		except:
 			return "Failed to parse input date"
 		
-		sql = """SELECT OPTEXT, STMNAME, STMVORNAME, TO_CHAR(TO_DATE(STMGEBDAT, 'YYYYMMDD'), 'DD.MM.YYYY'), OPSAAL, OPSEQ, ID 
-			FROM DATO_OP
-			WHERE OPDATUM = '""" + str(dt.strftime("%Y%m%d")) +  """'
-				AND UPPER(SUBSTR(OPTEXT, 0, 2)) = 'HA'
-				AND TSCANCEL IS NULL AND (DEL IS NULL OR DEL = 'N')
-			ORDER BY OPSAAL, OPSEQ"""
+		sql =  """SELECT o.OPTEXT, o.STMNAME, o.STMVORNAME, TO_CHAR(TO_DATE(o.STMGEBDAT, 'YYYYMMDD'), 'DD.MM.YYYY'), o.OPSAAL, o.OPSEQ, o.ID,
+					 h.VENFLON_R, h.VENFLON_L, h.INFUSION_RV, h.INFUSION_3H
+
+		FROM DATO_OP o LEFT JOIN DATO_HOLDINGAREA h ON (o.ID = h.OPID)
+
+		WHERE o.OPDATUM = '""" + str(dt.strftime("%Y%m%d")) +  """'
+			AND UPPER(SUBSTR(o.OPTEXT, 0, 2)) = 'HA'
+			AND o.TSCANCEL IS NULL AND (o.DEL IS NULL OR o.DEL = 'N')
+		ORDER BY o.OPSAAL, o.OPSEQ"""
 		
 		#web.debug(conn)
 		#web.debug(cursor)
@@ -248,7 +251,7 @@ class ha(webctx):
 		alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 		
 		for row in cursor:
-			if row[0][3].lower() not in alpha:
+			if row[0][2].lower() not in alpha:
 			 res.append(row)
 		
 		return self.render().ha(res, dt.strftime("%d.%m.%Y"))
