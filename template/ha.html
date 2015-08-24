@@ -112,11 +112,12 @@ $def with (recordset, datum)
 	}
 	</script>
 	<style>
-		#datum {width: 6em;}
+		#datum {width: 18em;}
 		body {padding-top: 1em;}
 		
 		@media print {
-			#foot, #dateform {display: none;}
+			#foot {display: none;}
+			/* #dateform  */
 		}
 	</style>
 </head>
@@ -127,9 +128,14 @@ $def with (recordset, datum)
 
 	<div class="form-group" id="dateform">
 		<form action="/ha" method="GET">
-		<lable for="datum">Datum:</label>		
-		<input type="text" name="datum" id="datum" value="$datum" />
-		<button type="submit">Yepppers</button>
+		<!-- label for="datum">Datum:</label -->
+		<div class='input-group date' id="datum">
+			<input type="text" name="datum" value="$datum" class="form-control" />
+			<span class="input-group-addon">
+				<span class="glyphicon glyphicon-calendar"></span>
+			</span>	
+			<button type="submit" class="form-control">Anzeigen&nbsp;»</button>
+		</div>
 		</form>
 	</div>
 
