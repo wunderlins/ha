@@ -228,7 +228,7 @@ class ha(webctx):
 			return "Failed to parse input date"
 		
 		sql =  """SELECT o.OPTEXT, o.STMNAME, o.STMVORNAME, TO_CHAR(TO_DATE(o.STMGEBDAT, 'YYYYMMDD'), 'DD.MM.YYYY'), o.OPSAAL, o.OPSEQ, o.ID,
-					 h.VENFLON_R, h.VENFLON_L, h.INFUSION_RV, h.INFUSION_3H
+					 h.VENFLON_R, h.VENFLON_L, h.INFUSION_RV, h.INFUSION_3H, BEMERKUNG
 
 		FROM DATO_OP o LEFT JOIN DATO_HOLDINGAREA h ON (o.ID = h.OPID)
 
@@ -272,13 +272,14 @@ class ha(webctx):
 			
 			# check if all False
 			if row["INFUSION_3H"] == False and row["INFUSION_RV"] == False and \
-			   row["VENFLON_L"] == False and row["VENFLON_R"] == False:
+			   row["VENFLON_L"] == False and row["VENFLON_R"] == False and row["BEMERKUNG"] == "":
 				
 				# all False,: delete db record
 				sql = "DELETE FROM DATO_HOLDINGAREA WHERE OPID = " + str(row["id"])
 				web.debug(sql)
 				try:
 					cursor.execute(sql)
+					conn.commit()
 				except Exception, e:
 					web.debug(e)
 					return '{"success": false, "message": "Failed to delete in database"}'
@@ -304,11 +305,14 @@ class ha(webctx):
 					         VENFLON_R = """ + str(int(row["VENFLON_R"])) + """,
 					         VENFLON_L = """ + str(int(row["VENFLON_L"])) + """,
 					         INFUSION_RV = """ + str(int(row["INFUSION_RV"])) + """,
-					         INFUSION_3H = """ + str(int(row["INFUSION_3H"])) + """
+					         INFUSION_3H = """ + str(int(row["INFUSION_3H"])) + """,
+					         BEMERKUNG = '""" + str(row["BEMERKUNG"]).replace("'", "''") + """'
 					         WHERE OPID = """ + str(row["id"])
 					web.debug(sql)
 					try:
+						#cursor.prepare(sql)
 						cursor.execute(sql)
+						conn.commit()
 					except Exception, e:
 						web.debug(e)
 						return '{"success": false, "message": "Failed to update in database"}'
@@ -316,11 +320,14 @@ class ha(webctx):
 				else:
 					# insert
 					sql = """INSERT INTO DATO_HOLDINGAREA 
-					         (VENFLON_R, VENFLON_L, INFUSION_RV, INFUSION_3H, OPID) VALUES ( """ + \
-					         str(int(row["VENFLON_R"])) + ", " + str(int(row["VENFLON_L"])) + ", " + str(int(row["INFUSION_RV"])) + ", " + str(int(row["INFUSION_3H"])) + ", " + str(int(row["id"])) + ")"
+					         (VENFLON_R, VENFLON_L, INFUSION_RV, INFUSION_3H, BEMERKUNG, OPID) VALUES ( """ + \
+					         str(int(row["VENFLON_R"])) + ", " + str(int(row["VENFLON_L"])) + ", " + \
+					         str(int(row["INFUSION_RV"])) + ", " + str(int(row["INFUSION_3H"])) + ", '" + str(row["BEMERKUNG"]).replace("'", "''") + \
+					         "', " + str(int(row["id"])) + ")"
 					web.debug(sql)
 					try:
 						cursor.execute(sql)
+						conn.commit()
 					except Exception, e:
 						web.debug(e)
 						return '{"success": false, "message": "Failed to insert in database"}'
