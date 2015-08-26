@@ -114,6 +114,7 @@ def init_session(app):
 		#	webctx.session[k] = session_default[k]
 		#webctx.session.uid = -1
 		#web.debug(webctx.session.keys())
+		web.config._session = webctx.session
 	else:
 		web.debug("Reusing session ...")
 		webctx.session = web.config._session

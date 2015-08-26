@@ -177,6 +177,7 @@ class login(webctx):
 		
 		authdb.close()
 		
+		"""
 		# if not found check against ldap
 		usbauth.init(
 			authdn = "CN=MUANA,OU=GenericMove,OU=Users,OU=USB,DC=ms,DC=uhbs,DC=ch",
@@ -192,7 +193,7 @@ class login(webctx):
 			session.user = username
 			session.email = emp["email"]
 			return '{"success": true}'
-		
+		"""
 		return '{"success": false}'
 
 class index(webctx):
@@ -211,10 +212,9 @@ class index(webctx):
 class ha(webctx):
 	""" Serve index page """
 	def GET(self):
-		"""
 		if not self.auth_check():
 			return self.render().login()
-		"""
+		
 		conn, cursor = oraconn()
 		
 		default_dt = datetime.datetime.now() + datetime.timedelta(days=1)
