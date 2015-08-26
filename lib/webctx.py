@@ -122,7 +122,8 @@ class webctx(object):
 	
 	def render(self):
 		return web.template.render('template', globals={
-			'is_dict': is_dict
+			'is_dict': is_dict,
+			'ctx': web.ctx
 		})
 	
 	def error(self, code):
