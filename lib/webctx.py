@@ -21,7 +21,7 @@ tns_str = "(DESCRIPTION = "+\
 	"(failover_mode=(type=select) (method=basic))))"
 
 
-session = None
+#session = None
 
 def oraconn():
 	con = cx_Oracle.connect('oppsc', 'oppsc', tns_str)
@@ -169,6 +169,7 @@ class login(webctx):
 			if row:
 				authdb.close()
 				web.debug(row)
+				web.debug(session)
 				#session = session_default
 				session.uid = row[0]
 				session.user = username
@@ -178,7 +179,7 @@ class login(webctx):
 		
 		authdb.close()
 		
-		"""
+		
 		# if not found check against ldap
 		usbauth.init(
 			authdn = "CN=MUANA,OU=GenericMove,OU=Users,OU=USB,DC=ms,DC=uhbs,DC=ch",
@@ -194,7 +195,7 @@ class login(webctx):
 			session.user = username
 			session.email = emp["email"]
 			return '{"success": true}'
-		"""
+		
 		return '{"success": false}'
 
 class index(webctx):
@@ -238,6 +239,7 @@ class ha(webctx):
 			AND o.TSCANCEL IS NULL AND (o.DEL IS NULL OR o.DEL = 'N')
 		ORDER BY o.OPSAAL, o.OPSEQ"""
 		
+		web.debug(sql)
 		#web.debug(conn)
 		#web.debug(cursor)
 		
@@ -255,7 +257,22 @@ class ha(webctx):
 			if row[0][2].lower() not in alpha:
 			 res.append(row)
 		
-		return self.render().ha(res, dt.strftime("%d.%m.%Y"))
+		# get daily data
+		sql = "SELECT OA, AA, PFL FROM DATO_HOLDINGAREA_STAFF WHERE DATUM = TO_DATE('" + str(dt.strftime("%Y%m%d")) +  "', 'YYYYMMDD')"
+		
+		try:
+			cursor.execute(sql)
+		except Exception, e:
+			web.debug(e)
+			return "database error"
+		
+		staff = {"OA": "", "AA": "", "PFL": ""}
+		for row in cursor:
+			staff = {"OA": row[0], "AA": row[1], "PFL": row[2]}
+		
+		web.debug(res)
+		
+		return self.render().ha(res, staff, dt.strftime("%d.%m.%Y"))
 
 	def POST(self):
 		raw_data = web.data()

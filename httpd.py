@@ -10,7 +10,7 @@ need root privvileges to bind ports below 1024.
 """
 
 meta = {
-	"name": "framework",
+	"name": "op",
 	"version": "0.0.1"
 }
 
@@ -140,7 +140,7 @@ except NameError:
 
 app = None
 if __name__ == "__main__":
-	web.config.debug = True
+	web.config.debug = False
 
 	app = service(urls, globals())
 	# session setup, make sure to call it only once if in debug mode
