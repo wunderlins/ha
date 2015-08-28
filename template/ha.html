@@ -117,7 +117,7 @@ $def with (recordset, staff, datum)
 		
 		$$.ajax({
 				method: "POST",
-				url: "ha",
+				url: "$config.baseurl/ha",
 				data: JSON.stringify(r)
 			})
 			.done(function(data) {
@@ -168,7 +168,7 @@ $def with (recordset, staff, datum)
 <div class="container">
 
 	<div class="form-group pull-left" id="dateform">
-		<form action="/ha" method="GET" class="form-inline">
+		<form action="$config.baseurl/ha" method="GET" class="form-inline">
 		<label for="datum">Datum:</label>
 		<div class='input-group date' id="datum">
 			<input type="text" name="datum" id="calinput" value="$datum" class="form-control" />

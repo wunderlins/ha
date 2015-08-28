@@ -123,7 +123,8 @@ class webctx(object):
 	def render(self):
 		return web.template.render('template', globals={
 			'is_dict': is_dict,
-			'ctx': web.ctx
+			'ctx': web.ctx,
+			'config': config
 		})
 	
 	def error(self, code):
@@ -142,7 +143,7 @@ class login(webctx):
 		if (user_data.logout == "true"):
 			#session = session_default
 			session.kill()
-			raise web.seeother('/')
+			raise web.seeother(config.baseurl + '/')
 	
 	""" authenticate user """
 	def POST(self):
