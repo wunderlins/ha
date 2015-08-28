@@ -143,6 +143,9 @@ $def with (recordset, staff, datum)
 		}
 
 		$$('#datum').datetimepicker(options)
+		$$('#datum').on("dp.change", function(e) {
+			document.getElementById("dtform").submit()
+		});
 	}
 	</script>
 	<style>
@@ -168,7 +171,7 @@ $def with (recordset, staff, datum)
 <div class="container">
 
 	<div class="form-group pull-left" id="dateform">
-		<form action="$config.baseurl/ha" method="GET" class="form-inline">
+		<form action="$config.baseurl/ha" method="GET" class="form-inline" id="dtform">
 		<label for="datum">Datum:</label>
 		<div class='input-group date' id="datum">
 			<input type="text" name="datum" id="calinput" value="$datum" class="form-control" />
@@ -176,7 +179,7 @@ $def with (recordset, staff, datum)
 				<span class="glyphicon glyphicon-calendar"></span>
 			</span>	
 		</div>
-		<button type="submit" class="form-control" id="anzeigen">Anzeigen&nbsp;»</button>
+		<!--button type="submit" class="form-control" id="anzeigen">Anzeigen&nbsp;»</button-->
 		</form>
 	</div>
 	
