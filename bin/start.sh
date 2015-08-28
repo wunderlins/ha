@@ -2,3 +2,4 @@
 . etc/config.py
 
 nohup ./httpd.py > $web_logfile &
+echo $$ > op.pid
