@@ -10,3 +10,9 @@ ln -s wsgilog-0.3 wsgilog
 
 cd ..
 
+cd static
+
+for f in "*.zip"; do
+	unzip "$f"
+done
+

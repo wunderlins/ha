@@ -1,0 +1,20 @@
+sudo apt-get install python python-dev python-setuptools gcc libaio1 unzip python-pip swat vim
+
+get insta client from here:
+http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html
+
+instantclient-basic-linux.x64-12.1.0.1.0.zip
+instantclient-sdk-linux.x64-12.1.0.1.0.zip
+
+unzip both files 
+
+add the following lines to /etc/bash.bashrc or equivalent. in some cases you must create a wrapper bash script setting these variables befiore running your own script. in my case i had to do it for cron (see export.sh)
+
+export PATH=$PATH:/opt/instantclient_12_1
+export ORACLE_HOME=/opt/instantclient_12_1
+export LD_LIBRARY_PATH=$ORACLE_HOME
+
+$ cd instantclient_12_1/
+$ ln -s libclntsh.so.12.1 libclntsh.so
+
+$ sudo pip install cx_Oracle
