@@ -266,7 +266,7 @@ class ha(webctx):
 			web.debug(e)
 			return "database error"
 		
-		staff = {"OA": "", "AA": "", "PFL": ""}
+		staff = {"OA": "", "AA": "", "PFL": "85244"}
 		for row in cursor:
 			staff = {"OA": row[0], "AA": row[1], "PFL": row[2]}
 		
@@ -285,8 +285,50 @@ class ha(webctx):
 		except:
 			return '{"success": false, "message": "Failed to decode json string"}'
 		
-		for row in data:
-			web.debug(row)
+		try:
+			data["ma"]["datum"] = datetime.datetime.strptime(data["ma"]["datum"], '%d.%m.%Y')
+		except:
+			return "Failed to parse input date"
+
+		#web.debug(data["ma"])
+		
+		# update metadata
+		
+		sql = "SELECT DATUM FROM DATO_HOLDINGAREA_STAFF WHERE DATUM = TO_DATE('%s', 'YYYYMMDD')" % \
+		       data["ma"]["datum"].strftime('%Y%m%d')
+		web.debug(sql)
+		try:
+			cursor.execute(sql)
+		except Exception, e:
+			#web.debug(e)
+			return '{"success": false, "message": "Failed to query metadata in database"}'
+
+		count = 0
+		for r in cursor:
+			count += 1
+
+		if count: # update
+			sql = """UPDATE DATO_HOLDINGAREA_STAFF
+				     SET AA='%s',
+				         OA='%s',
+				         PFL='%s'
+				     WHERE DATUM = TO_DATE('%s', 'YYYYMMDD')""" % \
+			(data["ma"]["aa"], data["ma"]["oa"], data["ma"]["pfl"], data["ma"]["datum"].strftime('%Y%m%d'))
+		else:
+			sql = """INSERT INTO DATO_HOLDINGAREA_STAFF (AA, OA, PFL, DATUM) VALUES
+				       ('%s', '%s', '%s',  TO_DATE('%s', 'YYYYMMDD')) """ % \
+			(data["ma"]["aa"], data["ma"]["oa"], data["ma"]["pfl"], data["ma"]["datum"].strftime('%Y%m%d'))
+				
+		try:
+			cursor.execute(sql)
+			conn.commit()
+		except Exception, e:
+			web.debug(sql)
+			web.debug(e)
+			return '{"success": false, "message": "Failed to update metadata in database"}'
+		
+		for row in data["grid"]:
+			#web.debug(row)
 			
 			# check if all False
 			if row["INFUSION_3H"] == False and row["INFUSION_RV"] == False and \
@@ -294,7 +336,7 @@ class ha(webctx):
 				
 				# all False,: delete db record
 				sql = "DELETE FROM DATO_HOLDINGAREA WHERE OPID = " + str(row["id"])
-				web.debug(sql)
+				#web.debug(sql)
 				try:
 					cursor.execute(sql)
 					conn.commit()
@@ -305,11 +347,11 @@ class ha(webctx):
 			else:
 				# check if record exists
 				sql = "SELECT OPID FROM DATO_HOLDINGAREA WHERE OPID = " + str(row["id"])
-				web.debug(sql)
+				#web.debug(sql)
 				try:
 					cursor.execute(sql)
 				except Exception, e:
-					web.debug(e)
+					#web.debug(e)
 					return '{"success": false, "message": "Failed to query in database"}'
 				
 				count = 0
@@ -318,7 +360,7 @@ class ha(webctx):
 				
 				if count:
 					# update
-					web.debug(row)
+					#web.debug(row)
 					sql = """UPDATE DATO_HOLDINGAREA SET 
 					         VENFLON_R = """ + str(int(row["VENFLON_R"])) + """,
 					         VENFLON_L = """ + str(int(row["VENFLON_L"])) + """,
@@ -326,13 +368,13 @@ class ha(webctx):
 					         INFUSION_3H = """ + str(int(row["INFUSION_3H"])) + """,
 					         BEMERKUNG = '""" + str(row["BEMERKUNG"]).replace("'", "''") + """'
 					         WHERE OPID = """ + str(row["id"])
-					web.debug(sql)
+					#web.debug(sql)
 					try:
 						#cursor.prepare(sql)
 						cursor.execute(sql)
 						conn.commit()
 					except Exception, e:
-						web.debug(e)
+						#web.debug(e)
 						return '{"success": false, "message": "Failed to update in database"}'
 				
 				else:
@@ -342,12 +384,12 @@ class ha(webctx):
 					         str(int(row["VENFLON_R"])) + ", " + str(int(row["VENFLON_L"])) + ", " + \
 					         str(int(row["INFUSION_RV"])) + ", " + str(int(row["INFUSION_3H"])) + ", '" + str(row["BEMERKUNG"]).replace("'", "''") + \
 					         "', " + str(int(row["id"])) + ")"
-					web.debug(sql)
+					#web.debug(sql)
 					try:
 						cursor.execute(sql)
 						conn.commit()
 					except Exception, e:
-						web.debug(e)
+						#web.debug(e)
 						return '{"success": false, "message": "Failed to insert in database"}'
 			conn.commit()
 		

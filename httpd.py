@@ -140,7 +140,7 @@ except NameError:
 
 app = None
 if __name__ == "__main__":
-	web.config.debug = False
+	web.config.debug = True
 
 	app = service(urls, globals())
 	# session setup, make sure to call it only once if in debug mode

@@ -95,9 +95,16 @@ $def with (recordset, staff, datum)
 			*/
 			
 			temp[id]["INFUSION_3H"] = parseInt(current.options[current.selectedIndex].value);
-		}		
+		}
 		
-		console.log(temp)
+		var ma = {
+			oa: document.getElementById("oa").value,
+			aa: document.getElementById("aa").value,
+			pfl:  document.getElementById("pfl").value,
+			datum: document.getElementById("calinput").value
+		}
+		//console.log(ma)
+		//console.log(temp)
 		//console.log(filled)
 		
 		for (i=0; i<filled.length; i++) {
@@ -105,20 +112,20 @@ $def with (recordset, staff, datum)
 			t.id = filled[i];
 			result[result.length] = t;
 		}
-		
-		//console.log(result)
+		r = {grid: result, ma: ma}
+		console.log(r)
 		
 		$$.ajax({
 				method: "POST",
 				url: "ha",
-				data: JSON.stringify(result)
+				data: JSON.stringify(r)
 			})
 			.done(function(data) {
 				console.log(data)
 				if (data.success == false) {
 					alert("Fehler in der kommunikation mit dem server, Grund: " + data.message)
 				} else {
-					document.location.href = document.location.href
+					//document.location.href = document.location.href
 				}
 			})
 			.fail(function() {
@@ -160,7 +167,7 @@ $def with (recordset, staff, datum)
 		<form action="/ha" method="GET" class="form-inline">
 		<label for="datum">Datum:</label>
 		<div class='input-group date' id="datum">
-			<input type="text" name="datum" value="$datum" class="form-control" />
+			<input type="text" name="datum" id="calinput" value="$datum" class="form-control" />
 			<span class="input-group-addon">
 				<span class="glyphicon glyphicon-calendar"></span>
 			</span>	
@@ -172,15 +179,15 @@ $def with (recordset, staff, datum)
 	<div class="pull-left form-group form-inline" style="padding-left: 0.5em;">
 		<div class="form-group">
 			<label>HA Ana Team OA:</label>
-			<input type="text" name="" value="" class="arzt form-control">
+			<input type="text" id="oa" value="$staff['OA']" class="arzt form-control">
 		</div>
 		<div class="form-group">
 			<label>HA Ana Team AA:</label>
-			<input type="text" name="" value="" class="arzt form-control">
+			<input type="text" id="aa" value="$staff['OA']" class="arzt form-control">
 		</div>
 		<div class="form-group">
 			<label>HA Ana Pflege:</label>
-			<input type="text" name="" value="85244" class="form-control arzt">
+			<input type="text" id="pfl" value="$staff['PFL']" class="form-control arzt">
 		</div>
 	</div>
 
