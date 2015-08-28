@@ -125,7 +125,7 @@ $def with (recordset, staff, datum)
 				if (data.success == false) {
 					alert("Fehler in der kommunikation mit dem server, Grund: " + data.message)
 				} else {
-					//document.location.href = document.location.href
+					document.location.href = document.location.href
 				}
 			})
 			.fail(function() {
@@ -150,11 +150,15 @@ $def with (recordset, staff, datum)
 		body {padding-top: 1em;}
 		.comment {display: none;}
 		.arzt {width: 5em ! important;}
+		.printonly {display: none;}
 		
 		@media print {
 			#foot, .comment_input, #anzeigen {display: none;}
 			.comment {display: block;}
 			.container {font-size: 85% ! important;}
+			.printonly {display: block;}
+			#dateform, #ma {display: none}
+			select {border: 0px solid white;}
 		}
 	</style>
 </head>
@@ -176,7 +180,7 @@ $def with (recordset, staff, datum)
 		</form>
 	</div>
 	
-	<div class="pull-left form-group form-inline" style="padding-left: 0.5em;">
+	<div class="pull-left form-group form-inline" id="ma" style="padding-left: 0.5em;">
 		<div class="form-group">
 			<label>HA Ana Team OA:</label>
 			<input type="text" id="oa" value="$staff['OA']" class="arzt form-control">
@@ -189,6 +193,10 @@ $def with (recordset, staff, datum)
 			<label>HA Ana Pflege:</label>
 			<input type="text" id="pfl" value="$staff['PFL']" class="form-control arzt">
 		</div>
+	</div>
+	
+	<div class="printonly">
+	Datum: <b>$datum</b>, Ana Team OA: <b>$staff['OA']</b>, Ana Team AA: <b>$staff['OA']</b>, Ana Pflege: <b>$staff['PFL']</b>
 	</div>
 
 	<table class="table table-striped table-hover">
