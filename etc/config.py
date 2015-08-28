@@ -22,7 +22,7 @@ session_ignore_expiry=True
 session_ignore_change_ip=False
 session_expired_message='Session expired'
 
-baseurl='' # set this if you use a reverse proxy
+baseurl='/op/' # set this if you use a reverse proxy
 
 #tns_str="(DESCRIPTION = (FAILOVER = ON)(LOAD_BALANCE = OFF)(ENABLE=BROKEN)(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = oraisop.uhbs.ch)(PORT = 1545))(ADDRESS = (PROTOCOL = TCP)(HOST = oraisop2.uhbs.ch)(PORT = 1545)))(CONNECT_DATA =(SERVICE_NAME = ISOP_PRI.WORLD)(failover_mode=(type=select) (method=basic))))"
 
