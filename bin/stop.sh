@@ -4,5 +4,8 @@
 #	kill -TERM $p
 #done
 
+basedir="`cd $(dirname $0)/..;pwd`"
+cd "$basedir"
+
 kill -TERM `cat op.pid`
 
