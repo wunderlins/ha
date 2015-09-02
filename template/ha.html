@@ -118,6 +118,7 @@ $def with (recordset, staff, datum)
 		$$.ajax({
 				method: "POST",
 				url: "$config.baseurl/ha",
+				contentType: "application/json; charset=UTF8",
 				data: JSON.stringify(r)
 			})
 			.done(function(data) {
@@ -152,7 +153,7 @@ $def with (recordset, staff, datum)
 		#datum {width: 10em;}
 		body {padding-top: 1em;}
 		.comment {display: none;}
-		.arzt {width: 5em ! important;}
+		.arzt {width: 8em ! important;}
 		.printonly {display: none;}
 		
 		@media print {
