@@ -367,7 +367,7 @@ class ha(webctx):
 					         VENFLON_L = """ + str(int(row["VENFLON_L"])) + """,
 					         INFUSION_RV = """ + str(int(row["INFUSION_RV"])) + """,
 					         INFUSION_3H = """ + str(int(row["INFUSION_3H"])) + """,
-					         BEMERKUNG = '""" + str(row["BEMERKUNG"]).replace("'", "''") + """'
+					         BEMERKUNG = '""" + unicode(row["BEMERKUNG"]).replace("'", "''") + """'
 					         WHERE OPID = """ + str(row["id"])
 					#web.debug(sql)
 					try:
@@ -375,7 +375,7 @@ class ha(webctx):
 						cursor.execute(sql)
 						conn.commit()
 					except Exception, e:
-						#web.debug(e)
+						web.debug(e)
 						return '{"success": false, "message": "Failed to update in database"}'
 				
 				else:
