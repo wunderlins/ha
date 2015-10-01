@@ -11,7 +11,7 @@ need root privvileges to bind ports below 1024.
 
 meta = {
 	"name": "op",
-	"version": "0.0.1"
+	"version": "0.0.2"
 }
 
 # setup paths
@@ -41,6 +41,7 @@ urls = (
   '/', 'webctx.index',
   '/ha', 'webctx.ha',
   '/login', 'webctx.login',
+  '/feedback', 'webctx.checklist_feedback',
 )
 
 # default session values

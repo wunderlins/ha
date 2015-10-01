@@ -12,6 +12,7 @@ import usbauth
 import hashlib
 import sqlite3
 import cx_Oracle
+import smtplib
 
 tns_str = "(DESCRIPTION = "+\
 	"(FAILOVER = ON)(LOAD_BALANCE = OFF)(ENABLE=BROKEN)(ADDRESS_LIST ="+\
@@ -198,6 +199,116 @@ class login(webctx):
 			return '{"success": true}'
 		
 		return '{"success": false}'
+
+class checklist_feedback(webctx):
+	reason = [
+		u"Patientenidentifikation",
+		u"Markierung gemäss USB-Standard",
+		u"Pflege- / Patientendokumentation",
+		u"Letzte Nahrung (>6h)",
+		u"Zahnprotesen, Piercing, Hörgerät, Schmuck inkl. Ehering, Kleidung",
+		u"DK- und Magensondenbeutel",
+		u"Dekubitus vorhanden",
+		u"Patient zum Wasserlösen aufgefordert",
+		u"Isolationspflichtiger Patient"
+	]
+	
+	def GET(self):
+
+		conn, cursor = oraconn()
+		
+		today = datetime.datetime.now() # + datetime.timedelta(days=1)
+		
+		sql =  """SELECT o.ID, o.STMNAME, o.STMVORNAME, substr(o.OPTEXT, 0, 50)
+		FROM DATO_OP o
+		WHERE o.OPDATUM = '""" + str(today.strftime("%Y%m%d")) +  """'
+			AND o.TSCANCEL IS NULL AND (o.DEL IS NULL OR o.DEL = 'N')
+		ORDER BY o.STMNAME, o.STMVORNAME"""
+		
+		#web.debug(sql)
+		#web.debug(conn)
+		#web.debug(cursor)
+		
+		res = []
+		
+		try:
+			cursor.execute(sql)
+		except Exception, e:
+			web.debug(e)
+			return "database error"
+		
+		ops = []
+		for row in cursor:
+			ops.append(row)
+		
+		return web.template.render('template').checklist_feedback(ops, self.reason)
+	
+	def POST(self):
+		post = web.input()
+		conn, cursor = oraconn()
+		
+		reason = ""
+		
+		for p in post:
+			web.debug(p)
+			if p[0] == 'r':
+				reason += u" - " + self.reason[int(post[p])] + u"\n"
+
+		sql =  """SELECT o.STMNAME, o.STMVORNAME
+		FROM DATO_OP o
+		WHERE o.ID = %d""" % int(post["op"])
+		
+		try:
+			cursor.execute(sql)
+		except Exception, e:
+			web.debug(e)
+			return "database error"
+		
+		pat = ""
+		for row in cursor:
+			pat = row[0] + " " + row[1]
+			
+		
+		web.debug(post["bemerkung"])
+		
+		body = u"""Feedback aus dem OP bezgl. Präoperativer Checkliste
+
+Patient: %s
+
+Folgende Punkte wurden nicht vollständig erfüllt:
+~~~~
+
+Bemerkung:
+%s		
+		""" % (pat, unicode(post["bemerkung"]))
+		body = body.replace(u"~~~~", reason)
+		
+		import smtplib
+		import email.utils
+		from email.mime.text import MIMEText
+		from email.mime.multipart import MIMEMultipart
+
+		# Create the message
+		eml_from = 'simon.wunderlin@usb.ch'
+		eml_to =   'simon.wunderlin@usb.ch'
+		
+		
+		msg = MIMEMultipart('alternative')
+		msg['To'] = email.utils.formataddr(('Recipient', eml_to))
+		msg['From'] = email.utils.formataddr(('Author', eml_from))
+		msg['Subject'] = 'Simple test message'
+		textpart = MIMEText(body.encode('utf-8'), 'plain', 'utf-8')
+		msg.attach(textpart)
+		
+		server = smtplib.SMTP(config.smtp)
+		server.set_debuglevel(True) # show communication with the server
+		try:
+			server.sendmail(eml_from, [eml_to], msg.as_string())
+		finally:
+			server.quit()
+		
+		return email
+		
 
 class index(webctx):
 	""" Serve index page """
