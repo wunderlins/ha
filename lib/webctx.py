@@ -207,7 +207,6 @@ class checklist_feedback(webctx):
 		u"Pflege- / Patientendokumentation",
 		u"Letzte Nahrung (>6h)",
 		u"Zahnprotesen, Piercing, Hörgerät, Schmuck inkl. Ehering, Kleidung",
-		u"DK- und Magensondenbeutel",
 		u"Dekubitus vorhanden",
 		u"Patient zum Wasserlösen aufgefordert",
 		u"Isolationspflichtiger Patient"
@@ -254,7 +253,7 @@ class checklist_feedback(webctx):
 			if p[0] == 'r':
 				reason += u" - " + self.reason[int(post[p])] + u"\n"
 
-		sql =  """SELECT o.STMNAME, o.STMVORNAME
+		sql =  """SELECT o.STMNAME, o.STMVORNAME, o.FACHDISZI
 		FROM DATO_OP o
 		WHERE o.ID = %d""" % int(post["op"])
 		
@@ -265,11 +264,21 @@ class checklist_feedback(webctx):
 			return "database error"
 		
 		pat = ""
+		fach = ""
 		for row in cursor:
 			pat = row[0] + " " + row[1]
-			
+			fach = row[2]
 		
-		web.debug(post["bemerkung"])
+		to = "Stephan.Schaerer@usb.ch"		
+		if fach == "MD" or fach == "MK":
+			to = "Anja.Ulrich@usb.ch"
+		if fach == "AU" or fach == "FG" or fach == "FK" or fach == "HN":
+			to = "Anja.Ulrich@usb.ch"
+		
+		if fach == "XX" or fach == "AN":
+			return "Empfänger konnte nicht ermittelt werden."
+		
+		#web.debug(post["bemerkung"])
 		
 		body = u"""Feedback aus dem OP bezgl. Präoperativer Checkliste
 
@@ -292,23 +301,22 @@ Bemerkung:
 		eml_from = 'simon.wunderlin@usb.ch'
 		eml_to =   'simon.wunderlin@usb.ch'
 		
-		
 		msg = MIMEMultipart('alternative')
 		msg['To'] = email.utils.formataddr(('Recipient', eml_to))
-		msg['From'] = email.utils.formataddr(('Author', eml_from))
-		msg['Subject'] = 'Simple test message'
+		msg['From'] = email.utils.formataddr(('OP Koordination', eml_from))
+		msg['Subject'] = 'Feedback Praeoperative Checkliste'
 		textpart = MIMEText(body.encode('utf-8'), 'plain', 'utf-8')
 		msg.attach(textpart)
 		
 		server = smtplib.SMTP(config.smtp)
-		server.set_debuglevel(True) # show communication with the server
+		#server.set_debuglevel(True) # show communication with the server
+		
 		try:
 			server.sendmail(eml_from, [eml_to], msg.as_string())
 		finally:
 			server.quit()
 		
-		return email
-		
+		return "Versendet"
 
 class index(webctx):
 	""" Serve index page """

@@ -22,7 +22,7 @@ session_ignore_expiry=True
 session_ignore_change_ip=False
 session_expired_message='Session expired'
 
-baseurl='' # set this if you use a reverse proxy
+baseurl='/op/' # set this if you use a reverse proxy
 
 smtp="mail.usb.ch"
 
