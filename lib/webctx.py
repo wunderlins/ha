@@ -501,9 +501,9 @@ class ha(webctx):
 					# insert
 					sql = """INSERT INTO DATO_HOLDINGAREA 
 					         (VENFLON_R, VENFLON_L, INFUSION_RV, INFUSION_3H, BEMERKUNG, OPID) VALUES ( """ + \
-					         str(int(row["VENFLON_R"])) + ", " + str(int(row["VENFLON_L"])) + ", " + \
-					         str(int(row["INFUSION_RV"])) + ", " + str(int(row["INFUSION_3H"])) + ", '" + str(row["BEMERKUNG"]).replace("'", "''") + \
-					         "', " + str(int(row["id"])) + ")"
+					         unicode(int(row["VENFLON_R"])) + ", " + unicode(int(row["VENFLON_L"])) + ", " + \
+					         unicode(int(row["INFUSION_RV"])) + ", " + unicode(int(row["INFUSION_3H"])) + ", '" + unicode(row["BEMERKUNG"]).replace("'", "''") + \
+					         "', " + unicode(int(row["id"])) + ")"
 					#web.debug(sql)
 					try:
 						cursor.execute(sql)
