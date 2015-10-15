@@ -280,7 +280,9 @@ class checklist_feedback(webctx):
 		
 		#web.debug(post["bemerkung"])
 		
-		body = u"""Feedback aus dem OP bezgl. Präoperativer Checkliste
+		body = u"""Guten Tag
+
+Dieses Mail ist eine Rückmeldung im Zusammenhang mit der Präoperativen Checkliste an die entsprechend verantwortlichen FachbereichsleiterIn. Bitte leiten Sie dies in entsprechender Weise den direkt verantwortlichen Personen (z.B. Stationsleitung) weiter. So dass der Prozess in Zukunft eingehalten werden kann.
 
 Patient: %s
 
@@ -288,7 +290,10 @@ Folgende Punkte wurden nicht vollständig erfüllt:
 ~~~~
 
 Bemerkung:
-%s		
+%s
+
+mit bestem Dank für Ihre Mithilfe zu Gunsten der Patientensicherheit.
+
 		""" % (pat, unicode(post["bemerkung"]))
 		body = body.replace(u"~~~~", reason)
 		
@@ -298,12 +303,15 @@ Bemerkung:
 		from email.mime.multipart import MIMEMultipart
 
 		# Create the message
-		eml_from = 'simon.wunderlin@usb.ch'
-		eml_to =   'simon.wunderlin@usb.ch'
+		eml_from = 'Peter.Mueller@usb.ch'
+		# eml_to  = 'simon.wunderlin@usb.ch'
+		eml_to   = to
+		eml_bcc  = 'siegfried.batzer@usb.ch'
 		
 		msg = MIMEMultipart('alternative')
 		msg['To'] = email.utils.formataddr(('Recipient', eml_to))
-		msg['From'] = email.utils.formataddr(('OP Koordination', eml_from))
+		msg['From'] = email.utils.formataddr(("OP Koordination", eml_from))
+		msg['Bcc'] = email.utils.formataddr(('Kontrolle', eml_bcc))
 		msg['Subject'] = 'Feedback Praeoperative Checkliste'
 		textpart = MIMEText(body.encode('utf-8'), 'plain', 'utf-8')
 		msg.attach(textpart)
@@ -312,7 +320,7 @@ Bemerkung:
 		#server.set_debuglevel(True) # show communication with the server
 		
 		try:
-			server.sendmail(eml_from, [eml_to], msg.as_string())
+			server.sendmail(eml_from, [eml_to] + [eml_bcc], msg.as_string())
 		finally:
 			server.quit()
 		
