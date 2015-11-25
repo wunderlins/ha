@@ -326,6 +326,179 @@ mit bestem Dank für Ihre Mithilfe zu Gunsten der Patientensicherheit.
 		
 		return "Versendet"
 
+class checklist_feedback_stat(webctx):
+	reason = [
+		u"Patientenidentifikation",
+		u"Markierung gemäss USB-Standard",
+		u"Pflege- / Patientendokumentation",
+		u"Letzte Nahrung (>6h)",
+		u"Zahnprotesen, Piercing, Hörgerät, Schmuck inkl. Ehering, Kleidung",
+		u"Dekubitus vorhanden",
+		u"Patient zum Wasserlösen aufgefordert",
+		u"Isolationspflichtiger Patient",
+		u"OP ohne Information der Station verschoben"
+	]
+	
+	def GET(self):
+
+		conn, cursor = oraconn()
+		
+		today = datetime.datetime.now() # + datetime.timedelta(days=1)
+		
+		sql =  """SELECT o.ID, o.STMNAME, o.STMVORNAME, substr(o.OPTEXT, 0, 50)
+		FROM DATO_OP o
+		WHERE o.OPDATUM = '""" + str(today.strftime("%Y%m%d")) +  """'
+			AND o.TSCANCEL IS NULL AND (o.DEL IS NULL OR o.DEL = 'N')
+		ORDER BY o.STMNAME, o.STMVORNAME"""
+		
+		#web.debug(sql)
+		#web.debug(conn)
+		#web.debug(cursor)
+		
+		res = []
+		
+		try:
+			cursor.execute(sql)
+		except Exception, e:
+			web.debug(e)
+			return "database error"
+		
+		ops = []
+		for row in cursor:
+			ops.append(row)
+		
+		return web.template.render('template').checklist_feedback(ops, self.reason)
+	
+	def POST(self):
+		post = web.input()
+		conn, cursor = oraconn()
+		
+		reason = ""
+		
+		for p in post:
+			web.debug(p)
+			if p[0] == 'r':
+				reason += u" - " + self.reason[int(post[p])] + u"\n"
+		
+		# find patient
+		sql =  """SELECT o.STMNAME, o.STMVORNAME, o.FACHDISZI
+		FROM DATO_OP o
+		WHERE o.ID = %d""" % int(post["op"])
+		
+		try:
+			cursor.execute(sql)
+		except Exception, e:
+			web.debug(e)
+			return "database error"
+		
+		pat = ""
+		fach = ""
+		for row in cursor:
+			pat = row[0] + " " + row[1]
+			fach = row[2]
+		
+		# finde operateur email
+		sql = """
+		SELECT p.id, p.email
+		FROM CONF_PERSONAL p
+		WHERE p.id in (
+			(
+				SELECT o.chir1id as id
+				FROM DATO_OP o
+				WHERE o.ID = %d
+			) UNION (
+				SELECT o.chir2id as id
+				FROM DATO_OP o
+				WHERE o.ID = %d
+	
+			) UNION (
+				SELECT o.chir3id as id
+				FROM DATO_OP o
+				WHERE o.ID = %d
+	
+			) UNION (
+				SELECT o.chir4id as id
+				FROM DATO_OP o
+				WHERE o.ID = %d
+	
+			)
+		)
+		""" % (int(post["op"]), int(post["op"]), int(post["op"]), int(post["op"]))
+		
+		try:
+			cursor.execute(sql)
+		except Exception, e:
+			web.debug(e)
+			return "database error"
+		
+		to_lst = []
+		for row in cursor:
+			to_lst.append(row[1])
+		
+		
+		"""
+		to = "Stephan.Schaerer@usb.ch"		
+		if fach == "MD" or fach == "MK":
+			to = "Anja.Ulrich@usb.ch"
+		if fach == "AU" or fach == "FG" or fach == "FK" or fach == "HN":
+			to = "Anja.Ulrich@usb.ch"
+		
+		if fach == "XX" or fach == "AN":
+			return "Empfänger konnte nicht ermittelt werden."
+		"""
+		
+		
+		#web.debug(post["bemerkung"])
+		
+		body = u"""Guten Tag
+
+Dieses Mail ist eine Rückmeldung im Zusammenhang mit der Präoperativen Checkliste an die entsprechend verantwortlichen FachbereichsleiterIn. Bitte leiten Sie dies in entsprechender Weise den direkt verantwortlichen Personen (z.B. Stationsleitung) weiter. So dass der Prozess in Zukunft eingehalten werden kann.
+
+Patient: %s
+
+Folgende Punkte wurden nicht vollständig erfüllt:
+~~~~
+
+Bemerkung:
+%s
+
+mit bestem Dank für Ihre Mithilfe zu Gunsten der Patientensicherheit.
+
+		""" % (pat, unicode(post["bemerkung"]))
+		body = body.replace(u"~~~~", reason)
+		
+		import smtplib
+		import email.utils
+		from email.mime.text import MIMEText
+		from email.mime.multipart import MIMEMultipart
+
+		# Create the message
+		eml_from = 'Stephan.Schaerer@usb.ch'
+		# eml_to  = 'simon.wunderlin@usb.ch'
+		#eml_to   = to
+		eml_bcc  = 'Stephan.Schaerer@usb.ch'
+		
+		msg = MIMEMultipart('alternative')
+		#msg['To'] = email.utils.formataddr(('Recipient', eml_to))
+		#to_lst = ["simon.wunderlin@usb.ch", "mq_ana_it@usb.ch"]
+		msg['To'] = ",".join(to_lst)
+		msg['From'] = email.utils.formataddr(("OP Koordination", eml_from))
+		msg['Bcc'] = email.utils.formataddr(('Kontrolle', eml_bcc))
+		msg['Subject'] = 'Feedback Praeoperative Checkliste'
+		textpart = MIMEText(body.encode('utf-8'), 'plain', 'utf-8')
+		msg.attach(textpart)
+		
+		server = smtplib.SMTP(config.smtp)
+		#server.set_debuglevel(True) # show communication with the server
+		
+		try:
+			server.sendmail(eml_from, to_lst + [eml_bcc], msg.as_string())
+		finally:
+			server.quit()
+		
+		return "Versendet"
+
+
 class index(webctx):
 	""" Serve index page """
 	def GET(self):

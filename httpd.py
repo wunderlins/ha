@@ -42,6 +42,7 @@ urls = (
   '/ha', 'webctx.ha',
   '/login', 'webctx.login',
   '/feedback', 'webctx.checklist_feedback',
+  '/feedback_station', 'webctx.checklist_feedback_stat',
 )
 
 # default session values
