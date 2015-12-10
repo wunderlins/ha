@@ -367,7 +367,7 @@ class checklist_feedback_stat(webctx):
 		for row in cursor:
 			ops.append(row)
 		
-		return web.template.render('template').checklist_feedback(ops, self.reason)
+		return web.template.render('template').checklist_feedback_station(ops, self.reason)
 	
 	def POST(self):
 		post = web.input()
