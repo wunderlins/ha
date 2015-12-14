@@ -273,7 +273,7 @@ class checklist_feedback(webctx):
 		if fach == "MD" or fach == "MK":
 			to = "Anja.Ulrich@usb.ch"
 		if fach == "AU" or fach == "FG" or fach == "FK" or fach == "HN":
-			to = "Anja.Ulrich@usb.ch"
+			to = "Esther.Sackmann@usb.ch"
 		
 		if fach == "XX" or fach == "AN":
 			return "Empfänger konnte nicht ermittelt werden."
