@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+os.environ["NLS_LANG"] = "GERMAN_SWITZERLAND.UTF8"
+
 import web, config, json
 import datetime
 import time
 import re
 import base64
 import sys
-import os
 import usbauth
 import hashlib
 import sqlite3
@@ -294,7 +296,7 @@ Bemerkung:
 
 mit bestem Dank für Ihre Mithilfe zu Gunsten der Patientensicherheit.
 
-		""" % (pat, unicode(post["bemerkung"]))
+		""" % (pat.decode('utf8'), post["bemerkung"])
 		body = body.replace(u"~~~~", reason)
 		
 		import smtplib
@@ -435,6 +437,8 @@ class checklist_feedback_stat(webctx):
 		for row in cursor:
 			to_lst.append(row[1])
 		
+		# Debug
+		#to_lst = ["simon.wunderlin@usb.ch"]
 		
 		"""
 		to = "Stephan.Schaerer@usb.ch"		
@@ -464,7 +468,9 @@ Bemerkung:
 
 mit bestem Dank für Ihre Mithilfe zu Gunsten der Patientensicherheit.
 
-		""" % (pat, unicode(post["bemerkung"]))
+		""" % (pat.decode('utf8'), 
+			post["bemerkung"])
+		web.debug(pat)
 		body = body.replace(u"~~~~", reason)
 		
 		import smtplib
@@ -474,9 +480,11 @@ mit bestem Dank für Ihre Mithilfe zu Gunsten der Patientensicherheit.
 
 		# Create the message
 		eml_from = 'Stephan.Schaerer@usb.ch'
-		# eml_to  = 'simon.wunderlin@usb.ch'
 		#eml_to   = to
 		eml_bcc  = 'Stephan.Schaerer@usb.ch'
+
+		#eml_to  = 'simon.wunderlin@usb.ch'
+		#eml_bcc  = 'simon.wunderlin@usb.ch'
 		
 		msg = MIMEMultipart('alternative')
 		#msg['To'] = email.utils.formataddr(('Recipient', eml_to))
