@@ -775,3 +775,39 @@ class json2(webctx):
 		
 		return '{"error": 0, "i1": '+str(i1)+', "i2": '+str(i2)+', "res": '+str(res)+'}'
 
+class adcheck(webctx):
+	def GET(self):
+		inp = web.input(id=None)
+		
+		web.header('Content-Type', 'text/html; charset=utf-8')
+		
+		if inp.id == None:
+			return """
+<form method="GET">
+Username oder EMAil:
+<input type="text" value="" name="id"/>
+<br />
+<input type="submit" value="Suchen »" />
+</form>
+"""
+		
+		usbauth.init(
+			authdn = "CN=MUANA,OU=GenericMove,OU=Users,OU=USB,DC=ms,DC=uhbs,DC=ch",
+			authpw = "anaana",
+			baseDN = "ou=USB,dc=ms,dc=uhbs,dc=ch",
+			host = "ms.uhbs.ch",
+		)
+		
+		emp = usbauth.lookup(inp.id)
+		if (emp == None):
+			return "Not found"
+		
+		def _json_serial(obj):
+			"""JSON serializer for datetime"""
+
+			if isinstance(obj, datetime):
+				serial = obj.isoformat()
+				return serial
+				raise TypeError ("Type not serializable")
+
+		return "<pre>" + json.dumps(emp, sort_keys=True, indent=4, separators=(',', ': '), default=_json_serial)
