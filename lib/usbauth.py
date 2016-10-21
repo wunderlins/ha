@@ -266,8 +266,8 @@ Exit code
 	
 	# setup ldap connection
 	init(
-		authdn = "CN=MUANA,OU=GenericMove,OU=Users,OU=USB,DC=ms,DC=uhbs,DC=ch",
-		authpw = "anaana",
+		authdn = "CN=MUANAESTHESIE\, Multiuser (U111613),OU=GenericMove,OU=Users,OU=USB,DC=ms,DC=uhbs,DC=ch",
+		authpw = "Oa-86300",
 		baseDN = "ou=USB,dc=ms,dc=uhbs,dc=ch",
 		host = "ms.uhbs.ch",
 	)

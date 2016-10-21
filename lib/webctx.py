@@ -186,8 +186,8 @@ class login(webctx):
 		
 		# if not found check against ldap
 		usbauth.init(
-			authdn = "CN=MUANA,OU=GenericMove,OU=Users,OU=USB,DC=ms,DC=uhbs,DC=ch",
-			authpw = "anaana",
+			authdn = "CN=MUANAESTHESIE\, Multiuser (U111613),OU=GenericMove,OU=Users,OU=USB,DC=ms,DC=uhbs,DC=ch",
+			authpw = "Oa-86300",
 			baseDN = "ou=USB,dc=ms,dc=uhbs,dc=ch",
 			host = "ms.uhbs.ch",
 		)
@@ -219,10 +219,12 @@ class checklist_feedback(webctx):
 		conn, cursor = oraconn()
 		
 		today = datetime.datetime.now() # + datetime.timedelta(days=1)
+		yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
 		
 		sql =  """SELECT o.ID, o.STMNAME, o.STMVORNAME, substr(o.OPTEXT, 0, 50)
 		FROM DATO_OP o
-		WHERE o.OPDATUM = '""" + str(today.strftime("%Y%m%d")) +  """'
+		WHERE (o.OPDATUM = '""" + str(today.strftime("%Y%m%d")) +  """' OR 
+			o.OPDATUM = '""" + str(yesterday.strftime("%Y%m%d")) +  """' )
 			AND o.TSCANCEL IS NULL AND (o.DEL IS NULL OR o.DEL = 'N')
 		ORDER BY o.STMNAME, o.STMVORNAME"""
 		
@@ -799,9 +801,9 @@ Username oder EMAil:
 </form>
 """
 		
-		usbauth.init(
-			authdn = "CN=MUANA,OU=GenericMove,OU=Users,OU=USB,DC=ms,DC=uhbs,DC=ch",
-			authpw = "anaana",
+		init(
+			authdn = "CN=MUANAESTHESIE\, Multiuser (U111613),OU=GenericMove,OU=Users,OU=USB,DC=ms,DC=uhbs,DC=ch",
+			authpw = "Oa-86300",
 			baseDN = "ou=USB,dc=ms,dc=uhbs,dc=ch",
 			host = "ms.uhbs.ch",
 		)
