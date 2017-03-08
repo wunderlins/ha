@@ -24,7 +24,7 @@ session_expired_message='Session expired'
 
 baseurl='/op/' # set this if you use a reverse proxy
 
-smtp="mail.usb.ch"
+smtp="mailreplay.usb.ch"
 
 #tns_str="(DESCRIPTION = (FAILOVER = ON)(LOAD_BALANCE = OFF)(ENABLE=BROKEN)(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = oraisop.uhbs.ch)(PORT = 1545))(ADDRESS = (PROTOCOL = TCP)(HOST = oraisop2.uhbs.ch)(PORT = 1545)))(CONNECT_DATA =(SERVICE_NAME = ISOP_PRI.WORLD)(failover_mode=(type=select) (method=basic))))"
 
